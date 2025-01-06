@@ -20,8 +20,8 @@ export default function HomePage() {
       <HeroContainer>
         <HeroBg />
         {/* <Image srcSet={`${require('./images/grid.svg')} light, ${require('./images/grid-dark.svg')} dark`} /> */}
-        <h1>Time Travel API</h1>
-        <p>Bend Time with the First API for Time Travel</p>
+        <h1>QIMA API Reference</h1>
+        <p>Start with the First API for QIMA App</p>
         <Button size="large" variant="primary" tone="brand" to="/guides/quickstart">
           Get started
         </Button>

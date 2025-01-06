@@ -1,0 +1,2392 @@
+{
+  "openapi":"3.0.1",
+  "info":{
+    "title":"QIMAone Public Api",
+    "description":"QIMAone APIs and models",
+    "termsOfService":"https://qimaone.com",
+    "contact":{
+      "name":"QIMA support",
+      "email":"support@qimaone.com"
+    },
+    "version":"1.0.0",
+    "x-logo":{
+      "url":"/docs/images/qima-one-logo-canvas-100-50-100-50-px.png",
+      "altText":"QIMAone"
+    }
+  },
+  "servers":[
+    {
+      "url":"https://api.demo.qimaone.com",
+      "description":"Generated server url"
+    }
+  ],
+  "security":[
+    {
+      "bearerAuth":[
+
+      ]
+    }
+  ],
+  "tags":[
+    {
+      "name":"Authentication"
+    },
+    {
+      "name":"Check CSV process status"
+    },
+    {
+      "name":"Import (CSV)"
+    },
+    {
+      "name":"Inspections"
+    },
+    {
+      "name":"Manage product measurements"
+    },
+    {
+      "name":"Manage product's attachments"
+    },
+    {
+      "name":"Manage product's lab test reports"
+    },
+    {
+      "name":"Products"
+    },
+    {
+      "name":"Purchase orders"
+    }
+  ],
+  "paths":{
+    "/v1/products/{productId}/test-reports":{
+      "get":{
+        "tags":[
+          "Manage product's lab test reports"
+        ],
+        "summary":"Get test reports list for a given product",
+        "operationId":"getProductTestReports",
+        "parameters":[
+          {
+            "name":"page",
+            "in":"query",
+            "description":"Page number to fetch products for",
+            "required":false,
+            "schema":{
+              "type":"integer",
+              "format":"int32",
+              "default":0
+            },
+            "example":0
+          },
+          {
+            "name":"size",
+            "in":"query",
+            "description":"Number of products to fetch on given page",
+            "required":false,
+            "schema":{
+              "type":"integer",
+              "format":"int32",
+              "default":100
+            },
+            "example":18
+          },
+          {
+            "name":"sort",
+            "in":"query",
+            "description":"Parameter to sort results ",
+            "required":false,
+            "schema":{
+              "type":"string",
+              "default":"lastModifiedDate,desc"
+            },
+            "example":"lastModifiedDate,desc"
+          },
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"The product technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"Get list of product's test reports",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/PagedModelEntityModelTestReport"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post":{
+        "tags":[
+          "Manage product's lab test reports"
+        ],
+        "summary":"Import product test report from a given file",
+        "operationId":"importProductTestReport",
+        "parameters":[
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"The product technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          },
+          {
+            "name":"status",
+            "in":"query",
+            "description":"Test report status",
+            "required":false,
+            "schema":{
+              "type":"string",
+              "enum":[
+                "PASS",
+                "FAIL",
+                "DEROGATED",
+                "NA"
+              ],
+              "default":"NA"
+            },
+            "example":"PASS"
+          }
+        ],
+        "requestBody":{
+          "content":{
+            "multipart/form-data":{
+              "schema":{
+                "required":[
+                  "file"
+                ],
+                "type":"object",
+                "properties":{
+                  "file":{
+                    "type":"string",
+                    "description":"The product test report file\n\nAllowed mime types: \n\nimage/gif, image/jpeg, image/png, video/mp4, application/pdf, text/csv, application/vnd.ms-excel, application/msword, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "format":"binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses":{
+          "201":{
+            "description":"Test report file has been imported successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/TestReport"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Bad Request",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Product identifier not found":{
+                    "description":"Product identifier not found",
+                    "value":{
+                      "title":"PRODUCT_IDENTIFIER_NOT_FOUND",
+                      "detail":"The product identifier has not been found"
+                    }
+                  },
+                  "File type not supported":{
+                    "description":"File type not supported",
+                    "value":{
+                      "title":"MIME_TYPE_ERROR",
+                      "detail":"This file mime-type is not allowed here"
+                    }
+                  },
+                  "File size error":{
+                    "description":"File size error",
+                    "value":{
+                      "title":"FILE_SIZE_ERROR",
+                      "detail":"File is larger than '%s'"
+                    }
+                  },
+                  "File is empty":{
+                    "description":"File is empty",
+                    "value":{
+                      "title":"FILE_IS_EMPTY",
+                      "detail":"File must not be empty"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/attachments":{
+      "get":{
+        "tags":[
+          "Manage product's attachments"
+        ],
+        "summary":"Get attachment list for a given product",
+        "operationId":"getProductAttachments",
+        "parameters":[
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"The product technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"Get list of product's attachments",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/CollectionModelEntityModelAttachment"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Bad Request",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Product identifier not found":{
+                    "description":"Product identifier not found",
+                    "value":{
+                      "title":"PRODUCT_IDENTIFIER_NOT_FOUND",
+                      "detail":"The product identifier has not been found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post":{
+        "tags":[
+          "Manage product's attachments"
+        ],
+        "summary":"Import product attachment from a given file",
+        "operationId":"importProductAttachment",
+        "parameters":[
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"The product technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          }
+        ],
+        "requestBody":{
+          "content":{
+            "multipart/form-data":{
+              "schema":{
+                "required":[
+                  "file"
+                ],
+                "type":"object",
+                "properties":{
+                  "file":{
+                    "type":"string",
+                    "description":"The product attachment file.\n\nAllowed mime types: \n\nimage/gif, image/jpeg, image/png, video/mp4, application/pdf, text/csv, application/vnd.ms-excel, application/msword, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "format":"binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses":{
+          "201":{
+            "description":"Attachment file has been imported successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Attachment"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Bad Request",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Problem"
+                },
+                "examples":{
+                  "Product identifier not found":{
+                    "description":"Product identifier not found",
+                    "value":{
+                      "title":"PRODUCT_IDENTIFIER_NOT_FOUND",
+                      "detail":"The product identifier has not been found"
+                    }
+                  },
+                  "File type not supported":{
+                    "description":"File type not supported",
+                    "value":{
+                      "title":"MIME_TYPE_ERROR",
+                      "detail":"This file mime-type is not allowed here"
+                    }
+                  },
+                  "File size error":{
+                    "description":"File size error",
+                    "value":{
+                      "title":"FILE_SIZE_ERROR",
+                      "detail":"File is larger than '%s'"
+                    }
+                  },
+                  "File is empty":{
+                    "description":"File is empty",
+                    "value":{
+                      "title":"FILE_IS_EMPTY",
+                      "detail":"File must not be empty"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/inspections":{
+      "get":{
+        "tags":[
+          "Inspections"
+        ],
+        "summary":"List of inspections",
+        "description":"Preceding a value with exclamation mark (!) will negate search for the given field, eg. inspectorEmail=!@qima.com will exclude inspections done by inspectors with this domain in the email from the result. At the same time strict=true&inspectorEmail=!saas@qima.com will only exclude inspections done by inspector with this specific email from the result.",
+        "operationId":"Inspections_1",
+        "parameters":[
+          {
+            "name":"page",
+            "in":"query",
+            "description":"The base page index (0...N)",
+            "required":false,
+            "schema":{
+              "type":"integer",
+              "default":0
+            },
+            "example":0
+          },
+          {
+            "name":"size",
+            "in":"query",
+            "description":"The size of the page to be returned",
+            "required":false,
+            "schema":{
+              "type":"integer",
+              "default":18
+            },
+            "example":18
+          },
+          {
+            "name":"strict",
+            "in":"query",
+            "description":"If set to 'true', system will filter all inspections which id EQUALS to given filter value,when set to 'false' it will filter all inspections which id CONTAINS given filter value.",
+            "required":false,
+            "schema":{
+              "type":"boolean",
+              "default":false
+            }
+          },
+          {
+            "name":"entityName",
+            "in":"query",
+            "description":"Entity name",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":"ENTITY"
+          },
+          {
+            "name":"status",
+            "in":"query",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":"PENDING"
+          },
+          {
+            "name":"typeLabel",
+            "in":"query",
+            "description":"Multiple values could be provided delimited by commas",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":"CLC,ASF"
+          },
+          {
+            "name":"inspectionDate",
+            "in":"query",
+            "description":"The values should be provided in order of: yyyy-MM-dd,yyyy-MM-dd, timezone.  The timezone: such as America/Los_Angeles, Europe/Kiev",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":"2022-03-25,2022-03-28,Europe/Kiev"
+          },
+          {
+            "name":"productIdentifier",
+            "in":"query",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":"Product ABC"
+          },
+          {
+            "name":"purchaseOrderReference",
+            "in":"query",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":"RTYI123"
+          },
+          {
+            "name":"inspectionResult",
+            "in":"query",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":"PASS"
+          },
+          {
+            "name":"inspectorEmail",
+            "in":"query",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":"inspector@qima.com"
+          }
+        ],
+        "responses":{
+          "400":{
+            "description":"Bad request",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Input data type is wrong":{
+                    "description":"Input data type is wrong",
+                    "value":{
+                      "title":"ARGUMENT_TYPE_MISMATCH",
+                      "detail":"Failed to convert value '%s' to type '%s'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200":{
+            "description":"Inspection list was fetched from the system",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Inspection"
+                },
+                "examples":{
+                  "Search for one inspection with PO ref 'My PO'":{
+                    "description":"Search for one inspection with PO ref 'My PO'",
+                    "value":"{\n    \"links\": [\n        {\n            \"rel\": \"self\",\n            \"href\": \"https://api.demo.qimaone.com/v1/inspections?page=0&size=1&strict=false&purchaseOrderReference=My%20PO{&entityName,status,typeLabel,inspectionDate,productIdentifier,inspectorEmail}\"              }\n    ],\n    \"content\": [\n        {\n            \"id\": 123,\n            \"typeLabel\": \"SP\",\n            \"inspectionDate\": \"2022-02-22\",\n            \"status\": \"COMPLETED\",\n            \"reportDecision\": \"PENDING\",\n            \"method\": \"SELF_INSPECTION\",\n            \"productId\": 1000,\n            \"productIdentifierType\": \"SKU\",\n            \"productIdentifier\": \"My Product\",\n            \"productQuantity\": 150,\n            \"unit\": \"cs\",\n            \"purchaseOrderId\": 1500,\n            \"purchaseOrderReference\": \"My PO\",\n            \"purchaseOrderTier1Name\": \"Crossing Animal\",\n            \"inspectorId\": 2000,\n            \"inspectorFirstName\": \"Inspector\",\n            \"inspectorLastName\": \"Inspector\",\n            \"inspectorEmail\": \"inspector@qima.com\",\n            \"supplierRequest\": false,\n            \"brandName\": \"QIMA\",\n            \"inspectionResult\": \"PASS\"\n            \"links\": [\n                {\n                    \"rel\": \"self\",\n                    \"href\": \"https://api.demo.qimaone.com/v1/inspections/123/report\"\n                }\n            ]\n        }\n    ],\n    \"page\": {\n        \"size\": 1,\n        \"totalElements\": 31,\n        \"totalPages\": 31,\n        \"number\": 0\n    }\n}\n"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post":{
+        "tags":[
+          "Inspections"
+        ],
+        "summary":"Book Inspection using po product id and Inspection Template",
+        "operationId":"Inspections",
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/InspectionByPOProductId"
+              }
+            }
+          },
+          "required":true
+        },
+        "responses":{
+          "400":{
+            "description":"Bad request",
+            "content":{
+              "*/*":{
+                "schema":{
+                  "$ref":"#/components/schemas/Inspection"
+                }
+              }
+            }
+          },
+          "201":{
+            "description":"Inspection was successfully created",
+            "content":{
+              "*/*":{
+                "schema":{
+                  "$ref":"#/components/schemas/Inspection"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/imports/purchase-orders":{
+      "post":{
+        "tags":[
+          "Import (CSV)"
+        ],
+        "summary":"Import purchase orders from a csv file",
+        "operationId":"importPurchaseOrders",
+        "requestBody":{
+          "content":{
+            "multipart/form-data":{
+              "schema":{
+                "required":[
+                  "file"
+                ],
+                "type":"object",
+                "properties":{
+                  "file":{
+                    "description":"The file on text/csv format",
+                    "externalDocs":{
+                      "description":"File example",
+                      "url":"/docs/examples/import_purchase_order.csv"
+                    },
+                    "anyOf":[
+                      {
+                        "$ref":"#/components/schemas/PurchaseOrderImportExample"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses":{
+          "202":{
+            "description":"Import request successfully submitted. Operation is not successful yet (asynchronous task). Returns the associated process ID which the client should use get the status of the import.",
+            "headers":{
+              "processes location":{
+                "style":"simple",
+                "schema":{
+                  "type":"string",
+                  "description":"the location of the newly created process",
+                  "example":"/processes/7156ac64-0f83-4620-976f-073622a0447c"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/imports/products":{
+      "post":{
+        "tags":[
+          "Import (CSV)"
+        ],
+        "summary":"Import products from a csv file",
+        "operationId":"importProducts",
+        "requestBody":{
+          "content":{
+            "multipart/form-data":{
+              "schema":{
+                "required":[
+                  "file"
+                ],
+                "type":"object",
+                "properties":{
+                  "file":{
+                    "description":"The file on text/csv format",
+                    "externalDocs":{
+                      "description":"File example",
+                      "url":"/docs/examples/import_product.csv"
+                    },
+                    "anyOf":[
+                      {
+                        "$ref":"#/components/schemas/ProductImportExample"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses":{
+          "202":{
+            "description":"Import request successfully submitted. Operation is not successful yet (asynchronous task). Returns the associated process ID which the client should use get the status of the import.",
+            "headers":{
+              "processes location":{
+                "style":"simple",
+                "schema":{
+                  "type":"string",
+                  "description":"the location of the newly created process",
+                  "example":"/processes/7156ac64-0f83-4620-976f-073622a0447c"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/imports/products-measurements":{
+      "post":{
+        "tags":[
+          "Import (CSV)"
+        ],
+        "summary":"Import products measurements from a csv file",
+        "operationId":"importProductsMeasurements",
+        "requestBody":{
+          "content":{
+            "multipart/form-data":{
+              "schema":{
+                "required":[
+                  "file"
+                ],
+                "type":"object",
+                "properties":{
+                  "file":{
+                    "description":"The file on text/csv format",
+                    "externalDocs":{
+                      "description":"File example",
+                      "url":"/docs/examples/import_product_measurements.csv"
+                    },
+                    "anyOf":[
+                      {
+                        "$ref":"#/components/schemas/ProductMeasurementsImportExample"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses":{
+          "202":{
+            "description":"Import request successfully submitted. Operation is not successful yet (asynchronous task). Returns the associated process ID which the client should use get the status of the import.",
+            "headers":{
+              "processes location":{
+                "style":"simple",
+                "schema":{
+                  "type":"string",
+                  "description":"the location of the newly created process",
+                  "example":"/processes/7156ac64-0f83-4620-976f-073622a0447c"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/authenticate":{
+      "post":{
+        "tags":[
+          "Authentication"
+        ],
+        "summary":"Authenticate into the system with email and password",
+        "operationId":"authenticate",
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/AuthenticationRequest"
+              }
+            }
+          }
+        },
+        "responses":{
+          "401":{
+            "description":"Invalid email/password supplied"
+          },
+          "200":{
+            "description":"Successful operation",
+            "headers":{
+              "Bearer token":{
+                "style":"simple",
+                "schema":{
+                  "type":"string",
+                  "description":"the jwt token generated",
+                  "example":"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYWtlLWFjY291bnRAcWltYS5jb20iLCJwcm9maWxlcyI6IlJPTEVfQlJBTkQiLCJwcm9maWxlIjoiUk9MRV9CUkFORCIsImJyYW5kSWQiOjEwMDAsImZpcnN0TmFtZSI6IkpvaG4iLCJsYXN0TmFtZSI6IkRvZSIsImNvbXBhbnlOYW1lIjoiUUlNQSIsInBsYXRmb3JtVXNlcklkIjoxMDAwLCJwZXJtaXNzaW9ucyI6WyJBTkFMWVRJQ1NfUkVBRCIsIkNBUF9DUkVBVEUiLCJQVVJDSEFTRV9PUkRFUl9SRUFEIiwiUkVQT1JUX0FDS05PV0xFREdFIiwiUkVQT1JUX1JFQUQiLCJST0xFX0VESVQiLCJTRVRUSU5HU19FRElUIiwiU0VUVElOR1NfUkVBRCIsIlNJVEVfSU5WSVRFIiwiVEVBTV9JTlZJVEUiLCJWRU5ET1JfRURJVCIsIldPUktGTE9XX0RFTEVURSIsIldPUktGTE9XX0VESVQiLCJXT1JLRkxPV19SRUFEIl0sImV4cCI6MTYxNDcwMjk0NX0.ms4k-NIDUmHnDvPQiba6WzsZ2xecEH0KiIkeJpnzcfwwcNbOnuWP1ouGA_PtOWuRy5s-QVnVkYEgcrxeCHTTtQ"
+                }
+              }
+            },
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/AuthenticateSuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/purchase-orders/{purchaseOrderId}/status":{
+      "patch":{
+        "tags":[
+          "Purchase orders"
+        ],
+        "summary":"Updates purchase status order with given id",
+        "operationId":"updatePurchaseOrder",
+        "parameters":[
+          {
+            "name":"purchaseOrderId",
+            "in":"path",
+            "description":"The purchase order technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":123
+          }
+        ],
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "type":"string",
+                "description":"New status to be set",
+                "enum":[
+                  "CREATED",
+                  "CANCELLED",
+                  "USED"
+                ]
+              }
+            }
+          },
+          "required":true
+        },
+        "responses":{
+          "200":{
+            "description":"Purchase order status has been updated"
+          }
+        }
+      }
+    },
+    "/v1/purchase-orders":{
+      "get":{
+        "tags":[
+          "Purchase orders"
+        ],
+        "summary":"Get list of purchase orders",
+        "operationId":"purchaseOrders",
+        "parameters":[
+          {
+            "name":"page",
+            "in":"query",
+            "description":"Page number to fetch purchase orders for, default 0",
+            "required":false,
+            "schema":{
+              "type":"integer",
+              "format":"int32",
+              "default":0
+            },
+            "example":0
+          },
+          {
+            "name":"size",
+            "in":"query",
+            "description":"Number of purchase orders to fetch on given page, default 18",
+            "required":false,
+            "schema":{
+              "type":"integer",
+              "format":"int32",
+              "default":18
+            },
+            "example":18
+          },
+          {
+            "name":"referenceFilter",
+            "in":"query",
+            "description":"Reference filter, either part or full value",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":"po"
+          },
+          {
+            "name":"strict",
+            "in":"query",
+            "description":"If set to true, system will filter all purchase orders which reference EQUALS to given filter value,when set to false it will filter all purchase orders which reference CONTAINS given filter value.",
+            "required":false,
+            "schema":{
+              "type":"boolean",
+              "default":false
+            }
+          },
+          {
+            "name":"fetchProducts",
+            "in":"query",
+            "description":"If set to true, system will fetch the product details of the Purchase Order",
+            "required":false,
+            "schema":{
+              "type":"boolean",
+              "default":false
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"Purchase orders list was fetched from the system",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/PurchaseOrder"
+                },
+                "examples":{
+                  "Search for one purchase order with size = 2 and referenceFilter = 'Pickguard'":{
+                    "description":"Search for one purchase order with size = 2 and referenceFilter = 'Pickguard'",
+                    "value":{
+                      "links":[
+                        {
+                          "rel":"self",
+                          "href":"https://api.demo.qimaone.com/v1/purchase-orders?page=0&size=2&strict=false{&referenceFilter}"
+                        }
+                      ],
+                      "content":[
+                        {
+                          "id":1,
+                          "reference":"Pickguard-123",
+                          "shipmentDate":"2023-03-23",
+                          "orderDate":"2023-02-23",
+                          "tier1Id":100,
+                          "tier1Name":"Basile Inc",
+                          "tier2Id":null,
+                          "tier2Name":null,
+                          "lastModifiedByFirstName":"Chloe",
+                          "lastModifiedByLastName":"LEE",
+                          "lastModifiedDate":"2022-02-17T11:25:25.004367",
+                          "createdByFirstName":"Chloe",
+                          "createdByLastName":"LEE",
+                          "createdDate":"2022-01-03T13:25:24.574755",
+                          "status":"USED"
+                        },
+                        {
+                          "id":2,
+                          "reference":"Welsh Cheddar",
+                          "shipmentDate":"2023-03-23",
+                          "orderDate":"2023-02-23",
+                          "tier1Id":101,
+                          "tier1Name":"Basile factory ",
+                          "tier2Id":null,
+                          "tier2Name":null,
+                          "lastModifiedByFirstName":"Chloe",
+                          "lastModifiedByLastName":"LEE",
+                          "lastModifiedDate":"2022-02-17T08:37:11.893118",
+                          "createdByFirstName":"Chloe",
+                          "createdByLastName":"LEE",
+                          "createdDate":"2022-01-03T12:50:09.088392",
+                          "status":"CREATED"
+                        }
+                      ],
+                      "page":{
+                        "size":2,
+                        "totalElements":219,
+                        "totalPages":110,
+                        "number":0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products":{
+      "get":{
+        "tags":[
+          "Products"
+        ],
+        "summary":"List available products",
+        "operationId":"listProducts",
+        "parameters":[
+          {
+            "name":"page",
+            "in":"query",
+            "description":"Page number to fetch products for",
+            "required":false,
+            "schema":{
+              "type":"integer",
+              "format":"int32",
+              "default":0
+            },
+            "example":0
+          },
+          {
+            "name":"size",
+            "in":"query",
+            "description":"Number of products to fetch on given page",
+            "required":false,
+            "schema":{
+              "type":"integer",
+              "format":"int32",
+              "default":18
+            },
+            "example":18
+          },
+          {
+            "name":"identifier",
+            "in":"query",
+            "description":"Main identifier filter, either part or full identifier.",
+            "required":false,
+            "schema":{
+              "type":"string"
+            },
+            "example":123465
+          },
+          {
+            "name":"strict",
+            "in":"query",
+            "description":"If set to true, system will filter all products which id EQUALS to given filter value, when set to false it will filter all products which id CONTAINS given filter value.",
+            "required":false,
+            "schema":{
+              "type":"boolean",
+              "default":false
+            },
+            "example":false
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"Products list was fetched from the system",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/PagedModelProduct"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/test-reports/{testReportId}/files/{testReportUUID}":{
+      "get":{
+        "tags":[
+          "Manage product's lab test reports"
+        ],
+        "summary":"Get a specific test report details",
+        "operationId":"getProductTestReport",
+        "parameters":[
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"Inner QIMAone product id",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          },
+          {
+            "name":"testReportId",
+            "in":"path",
+            "description":"Inner QIMAone test report id",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          },
+          {
+            "name":"testReportUUID",
+            "in":"path",
+            "description":"Inner QIMAone test report UUID",
+            "required":true,
+            "schema":{
+              "type":"string"
+            },
+            "example":"10b3d5f4-e27b-437a-b1d1-389fc35cab65"
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"Test report details",
+            "content":{
+              "*/*":{
+                "schema":{
+                  "type":"string",
+                  "format":"binary"
+                }
+              }
+            }
+          },
+          "204":{
+            "description":"File does not exist",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Test report file not found":{
+                    "description":"Test report file not found",
+                    "value":{
+                      "title":"TEST_LAB_REPORT_FILE_NOT_FOUND",
+                      "detail":"The test report file has not been found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/attachments/{attachmentId}/files/{attachmentUUID}":{
+      "get":{
+        "tags":[
+          "Manage product's attachments"
+        ],
+        "summary":"Get the product's attachment file",
+        "operationId":"getProductAttachmentFile",
+        "parameters":[
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"Inner QIMAone product id",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          },
+          {
+            "name":"attachmentId",
+            "in":"path",
+            "description":"Inner QIMAone attachment id",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          },
+          {
+            "name":"attachmentUUID",
+            "in":"path",
+            "description":"Inner QIMAone attachment UUID",
+            "required":true,
+            "schema":{
+              "type":"string"
+            },
+            "example":"10b3d5f4-e27b-437a-b1d1-389fc35cab65"
+          }
+        ],
+        "responses":{
+          "204":{
+            "description":"File does not exist",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Attachment file not found":{
+                    "description":"Attachment file not found",
+                    "value":{
+                      "title":"ATTACHMENT_FILE_NOT_FOUND_EXAMPLE",
+                      "detail":"The attachment file has not been found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200":{
+            "description":"The file content",
+            "content":{
+              "*/*":{
+                "schema":{
+                  "type":"string",
+                  "format":"binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/processes/{processId}":{
+      "get":{
+        "tags":[
+          "Check CSV process status"
+        ],
+        "summary":"Retrieve the status of the process",
+        "operationId":"getProcess",
+        "parameters":[
+          {
+            "name":"processId",
+            "in":"path",
+            "description":"UUID of the process",
+            "required":true,
+            "schema":{
+              "type":"string",
+              "format":"uuid"
+            },
+            "example":"7156ac-0f83-4620-976f-073622a0447c"
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"The process state in case of status <strong>PENDING</strong> or <strong>FAILED</strong>",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "oneOf":[
+                    {
+                      "$ref":"#/components/schemas/PendingProcessDTO"
+                    },
+                    {
+                      "$ref":"#/components/schemas/FailedProcessDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404":{
+            "description":"The process with provided id is not found",
+            "content":{
+              "*/*":{
+                "schema":{
+                  "oneOf":[
+                    {
+                      "$ref":"#/components/schemas/CompletedProcessDTO"
+                    },
+                    {
+                      "$ref":"#/components/schemas/FailedProcessDTO"
+                    },
+                    {
+                      "$ref":"#/components/schemas/PendingProcessDTO"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "207":{
+            "description":"The process state in case of status <strong>COMPLETED</strong>",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/CompletedProcessDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/inspections/{inspectionId}/report":{
+      "get":{
+        "tags":[
+          "Inspections"
+        ],
+        "summary":"Download an inspection PDF report if it was already generated",
+        "operationId":"downloadInspectionPdfReport",
+        "parameters":[
+          {
+            "name":"inspectionId",
+            "in":"path",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            }
+          }
+        ],
+        "responses":{
+          "404":{
+            "description":"Inspection PDF report has not been found",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Inspection not found":{
+                    "description":"Inspection not found",
+                    "value":{
+                      "title":"INSPECTION_NOT_FOUND",
+                      "detail":"The inspection has not been found"
+                    }
+                  },
+                  "Inspection PDF report not found":{
+                    "description":"Inspection PDF report not found",
+                    "value":{
+                      "title":"REPORT_NOT_FOUND",
+                      "detail":"The report has not been found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200":{
+            "description":"Inspection PDF report was successfully downloaded",
+            "content":{
+              "*/*":{
+                "schema":{
+                  "type":"string",
+                  "format":"binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/test-reports/{testReportId}":{
+      "delete":{
+        "tags":[
+          "Manage product's lab test reports"
+        ],
+        "summary":"Delete product test report",
+        "operationId":"deleteTestReport",
+        "parameters":[
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"The product technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          },
+          {
+            "name":"testReportId",
+            "in":"path",
+            "description":"The product test report technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":10
+          }
+        ],
+        "responses":{
+          "204":{
+            "description":"Delete test report request operation successfully finished."
+          },
+          "400":{
+            "description":"Bad Request",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Product identifier not found":{
+                    "description":"Product identifier not found",
+                    "value":{
+                      "title":"PRODUCT_IDENTIFIER_NOT_FOUND",
+                      "detail":"The product identifier has not been found"
+                    }
+                  },
+                  "Test report not found":{
+                    "description":"Test report not found",
+                    "value":{
+                      "title":"TEST_LAB_REPORT_NOT_FOUND",
+                      "detail":"The test lab report has not been found"
+                    }
+                  },
+                  "Input data type is wrong":{
+                    "description":"Input data type is wrong",
+                    "value":{
+                      "title":"ARGUMENT_TYPE_MISMATCH",
+                      "detail":"Failed to convert value '%s' to type '%s'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/measurements":{
+      "delete":{
+        "tags":[
+          "Manage product measurements"
+        ],
+        "summary":"Delete product measurements",
+        "operationId":"deleteMeasurements",
+        "parameters":[
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"The product technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          }
+        ],
+        "responses":{
+          "404":{
+            "description":"Not Found",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Product identifier not found":{
+                    "description":"Product identifier not found",
+                    "value":{
+                      "title":"PRODUCT_IDENTIFIER_NOT_FOUND",
+                      "detail":"The product identifier has not been found"
+                    }
+                  },
+                  "Product measurements not found":{
+                    "description":"Product measurements not found",
+                    "value":{
+                      "title":"PRODUCT_MEASUREMENTS_NOT_FOUND",
+                      "detail":"No measurements found for product: %s"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Bad Request",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Input data type is wrong":{
+                    "description":"Input data type is wrong",
+                    "value":{
+                      "title":"ARGUMENT_TYPE_MISMATCH",
+                      "detail":"Failed to convert value '%s' to type '%s'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "204":{
+            "description":"Delete measurements request operation successfully finished."
+          }
+        }
+      }
+    },
+    "/v1/products/{productId}/attachments/{attachmentId}":{
+      "delete":{
+        "tags":[
+          "Manage product's attachments"
+        ],
+        "summary":"Delete product attachment",
+        "operationId":"deleteAttachment",
+        "parameters":[
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"The product technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":1
+          },
+          {
+            "name":"attachmentId",
+            "in":"path",
+            "description":"The product attachment technical identifier",
+            "required":true,
+            "schema":{
+              "type":"integer",
+              "format":"int64"
+            },
+            "example":10
+          }
+        ],
+        "responses":{
+          "204":{
+            "description":"Delete attachment request operation successfully finished."
+          },
+          "400":{
+            "description":"Bad Request",
+            "content":{
+              "application/json":{
+                "examples":{
+                  "Product identifier not found":{
+                    "description":"Product identifier not found",
+                    "value":{
+                      "title":"PRODUCT_IDENTIFIER_NOT_FOUND",
+                      "detail":"The product identifier has not been found"
+                    }
+                  },
+                  "Attachment not found":{
+                    "description":"Attachment not found",
+                    "value":{
+                      "title":"ATTACHMENT_NOT_FOUND",
+                      "detail":"The attachment has not been found"
+                    }
+                  },
+                  "Input data type is wrong":{
+                    "description":"Input data type is wrong",
+                    "value":{
+                      "title":"ARGUMENT_TYPE_MISMATCH",
+                      "detail":"Failed to convert value '%s' to type '%s'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components":{
+    "schemas":{
+      "TestReport":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"integer",
+            "format":"int64",
+            "example":1
+          },
+          "uuid":{
+            "type":"string",
+            "example":"7156ac-0f83-4620-976f-073622a04422c"
+          },
+          "name":{
+            "type":"string",
+            "example":"file.pdf"
+          },
+          "size":{
+            "type":"integer",
+            "format":"int64",
+            "example":1024
+          },
+          "lastModifiedBy":{
+            "type":"string",
+            "example":"John Doe"
+          },
+          "lastModifiedDate":{
+            "type":"string",
+            "format":"date-time",
+            "example":"2022-01-01T00:00:00Z"
+          },
+          "mimeType":{
+            "type":"string",
+            "example":"application/pdf"
+          },
+          "status":{
+            "type":"string",
+            "example":"PASS",
+            "enum":[
+              "PASS",
+              "FAIL",
+              "DEROGATED",
+              "NA"
+            ]
+          }
+        }
+      },
+      "Problem":{
+        "type":"object",
+        "properties":{
+          "type":{
+            "type":"string",
+            "format":"uri"
+          },
+          "title":{
+            "type":"string"
+          },
+          "status":{
+            "type":"integer",
+            "format":"int32"
+          },
+          "detail":{
+            "type":"string"
+          },
+          "instance":{
+            "type":"string",
+            "format":"uri"
+          }
+        }
+      },
+      "Attachment":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"integer",
+            "format":"int64",
+            "example":1
+          },
+          "uuid":{
+            "type":"string",
+            "example":"7156ac-0f83-4620-976f-073622a04422c"
+          },
+          "name":{
+            "type":"string",
+            "example":"file.pdf"
+          },
+          "size":{
+            "type":"integer",
+            "format":"int64",
+            "example":1024
+          },
+          "lastModifiedBy":{
+            "type":"string",
+            "example":"John Doe"
+          },
+          "lastModifiedDate":{
+            "type":"string",
+            "format":"date-time",
+            "example":"2022-01-01T00:00:00Z"
+          }
+        }
+      },
+      "InspectionByPOProductId":{
+        "type":"object",
+        "properties":{
+          "poProductId":{
+            "type":"integer",
+            "format":"int64"
+          },
+          "inspectionTemplateName":{
+            "type":"string"
+          },
+          "plannedDate":{
+            "type":"string",
+            "format":"date"
+          },
+          "timezone":{
+            "type":"string"
+          }
+        }
+      },
+      "Inspection":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"integer",
+            "format":"int64",
+            "example":1
+          },
+          "typeLabel":{
+            "type":"string",
+            "example":"CLC"
+          },
+          "inspectionDate":{
+            "type":"string",
+            "format":"date",
+            "example":"2022-06-24"
+          },
+          "shipmentDate":{
+            "type":"string",
+            "format":"date",
+            "example":"2022-06-24"
+          },
+          "status":{
+            "type":"string",
+            "example":"PENDING"
+          },
+          "reportDecision":{
+            "type":"string",
+            "example":"PENDING"
+          },
+          "method":{
+            "type":"string",
+            "example":"BRAND_STANDARD_INSPECTOR"
+          },
+          "site":{
+            "type":"string",
+            "example":"ENTITY"
+          },
+          "productId":{
+            "type":"integer",
+            "format":"int64",
+            "example":1
+          },
+          "poProductId":{
+            "type":"integer",
+            "format":"int64",
+            "example":1
+          },
+          "productIdentifierType":{
+            "type":"string",
+            "example":"NAME"
+          },
+          "productIdentifier":{
+            "type":"string",
+            "example":"Product ABC"
+          },
+          "productQuantity":{
+            "type":"integer",
+            "format":"int32",
+            "example":100
+          },
+          "unit":{
+            "type":"string",
+            "example":"pcs"
+          },
+          "purchaseOrderId":{
+            "type":"integer",
+            "format":"int64",
+            "example":1233
+          },
+          "purchaseOrderReference":{
+            "type":"string",
+            "example":"RTYI123"
+          },
+          "purchaseOrderTier1Name":{
+            "type":"string",
+            "example":"Entity 23"
+          },
+          "purchaseOrderTier2Name":{
+            "type":"string",
+            "example":"Entity 23"
+          },
+          "inspectorId":{
+            "type":"integer",
+            "format":"int64",
+            "example":59
+          },
+          "inspectorFirstName":{
+            "type":"string",
+            "example":"FIRSTNAME"
+          },
+          "inspectorLastName":{
+            "type":"string",
+            "example":"LASTNAME"
+          },
+          "inspectorEmail":{
+            "type":"string",
+            "example":"email@qima.com"
+          },
+          "supplierRequest":{
+            "type":"boolean",
+            "example":false
+          },
+          "brandName":{
+            "type":"string",
+            "example":"QIMA"
+          },
+          "inspectionResult":{
+            "type":"string",
+            "example":"PASS",
+            "enum":[
+              "PASS",
+              "FAIL",
+              "NA"
+            ]
+          },
+          "links":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "Link":{
+        "type":"object",
+        "properties":{
+          "rel":{
+            "type":"string"
+          },
+          "href":{
+            "type":"string"
+          },
+          "hreflang":{
+            "type":"string"
+          },
+          "media":{
+            "type":"string"
+          },
+          "title":{
+            "type":"string"
+          },
+          "type":{
+            "type":"string"
+          },
+          "deprecation":{
+            "type":"string"
+          },
+          "profile":{
+            "type":"string"
+          },
+          "name":{
+            "type":"string"
+          }
+        }
+      },
+      "PurchaseOrderImportExample":{
+        "required":[
+          "PO_REFERENCE",
+          "PRODUCT",
+          "QUANTITY",
+          "UNIT"
+        ],
+        "type":"object",
+        "properties":{
+          "PO_REFERENCE":{
+            "maxLength":50,
+            "type":"string",
+            "description":"Reference of your purchase order",
+            "example":"RKT725"
+          },
+          "CUSTOM_ID":{
+            "title":"Required (if no FACTORY_NAME)",
+            "type":"string",
+            "description":"Custom ID of the factory responsible for the purchase order (Tiers1)",
+            "example":"Factory experience"
+          },
+          "FACTORY_NAME":{
+            "title":"Required (if no CUSTOM_ID)",
+            "type":"string",
+            "description":"Name of the factory existing in your account. (Tiers1)",
+            "example":"Factory experience"
+          },
+          "PRODUCT":{
+            "type":"string",
+            "description":"Product identifier existing in your account",
+            "example":"Blue thermos"
+          },
+          "QUANTITY":{
+            "type":"string",
+            "description":"Quantity of the product required in the purchase order",
+            "example":"20000"
+          },
+          "UNIT":{
+            "type":"string",
+            "description":"Unit of the quantity of product",
+            "example":"pieces"
+          },
+          "SHIPMENT_DATE":{
+            "title":"Shipment date must be\nequal or after order\ndate\n",
+            "type":"string",
+            "description":"Expected date of\nshipment",
+            "format":"2021-02-25",
+            "example":"2021-03-26"
+          },
+          "ORDER_DATE":{
+            "title":"Order date must be\nequal or before\nshipment date\n",
+            "type":"string",
+            "description":"Order date",
+            "format":"2021-02-25",
+            "example":"2021-03-13"
+          },
+          "PRODUCTION_SITE_ID":{
+            "title":"If you want to use a\nproduction site, must be\npresent (if no\nPRODUCTION_SITE_NA\nME)\n",
+            "type":"string",
+            "description":"Custom ID of the Entity\nwhere the inspection\nwill take place, this\nentity should be\nmarked in your\nnetwork as a child of\nthe 'entity responsible\nfor PO' (Tiers 2)\n",
+            "example":"Fact001"
+          },
+          "PRODUCTION_SITE_NAME":{
+            "title":"If you want to use a\nproduction site, must be\npresent (if no\nPRODUCTION_SITE_ID)\n",
+            "type":"string",
+            "description":"Name of the entity\nwhere the inspection\nwill take place, this\nentity should be\nmarked in your\nnetwork as a child of\nthe 'entity responsible\nfor PO' (Tiers 2)\n",
+            "example":"Factory child 1"
+          },
+          "ACTION":{
+            "title":"Used to define which\ntype of update you want\nto do\n",
+            "type":"string",
+            "description":"Two possible values :\n\n1. CREATE_IF_NOT_EXISTS :\nUsed to create a\nnew line even if there\nis already an existing\nline in the PO for the\nsame PRODUCT. If the\nline already exists with\nthe same quantity, it\nwill be ignored.This\naction is used by\ndefault if ACTION field\nis empty.\n\n2. CREATE_OR_UPDATE :\nUsed to update an\nexisting line for the\nsame PRODUCT with a\nnew quantity or unit. If\nthe line doesn't exist in\nthe PO, it will be\ncreated.\nIf the line already\nexists but an\ninspection is scheduled\nor started on it, a new\nline will be created.\n",
+            "example":"CREATE_IF_NOT_EXISTS"
+          }
+        }
+      },
+      "ProductImportExample":{
+        "required":[
+          "NAME"
+        ],
+        "type":"object",
+        "properties":{
+          "NAME":{
+            "maxLength":100,
+            "type":"string",
+            "description":"Name of the product",
+            "example":"Blue thermos"
+          },
+          "GTIN":{
+            "maxLength":100,
+            "type":"string",
+            "description":"GTIN/EAN of the product",
+            "format":"numeric",
+            "example":"103924-239407"
+          },
+          "SKU":{
+            "maxLength":100,
+            "type":"string",
+            "description":"SKU of the product",
+            "example":"H8R7029V"
+          },
+          "REFERENCE":{
+            "maxLength":100,
+            "type":"string",
+            "description":"Reference of the product",
+            "example":"THN-2021-01"
+          },
+          "DESCRIPTION":{
+            "maxLength":100,
+            "type":"string",
+            "description":"Description of the product",
+            "example":"Blue thermos for 2021 with white whale print"
+          }
+        }
+      },
+      "ProductMeasurementsImportExample":{
+        "required":[
+          "DESCRIPTION",
+          "PRODUCT",
+          "REFERENCE",
+          "TOLERANCE+",
+          "TOLERANCE-",
+          "UNIT",
+          "VARIANT_NAME",
+          "VARIANT_VALUE"
+        ],
+        "type":"object",
+        "properties":{
+          "PRODUCT":{
+            "type":"string",
+            "description":"Product identifier existing in your account",
+            "example":"Blue thermos"
+          },
+          "SECTION":{
+            "type":"string",
+            "description":"Measurement section of your product"
+          },
+          "UNIT":{
+            "title":"Unique for the same\nproduct.\nQIMA shortlisted unit only\n",
+            "type":"string",
+            "description":"Unit of your point of measurement",
+            "example":"cm"
+          },
+          "REFERENCE":{
+            "type":"string",
+            "description":"Reference of your point of measurement",
+            "example":"1A"
+          },
+          "DESCRIPTION":{
+            "maxLength":50,
+            "type":"string",
+            "description":"Description of your point of measurement",
+            "example":"Shoulder Width Point to Point"
+          },
+          "TOLERANCE-":{
+            "type":"string",
+            "description":"Tolerance – of your point of measurement",
+            "example":"0.5"
+          },
+          "TOLERANCE+":{
+            "type":"string",
+            "description":"Tolerance + of your point of measurement",
+            "example":"0.25"
+          },
+          "TO_BE_INSPECTED":{
+            "type":"boolean",
+            "description":"If “true: this point of\nmeasurement will be\nadded automatically in\nyour inspection booking\n(if there is a\nMeasurement checklist\nin your workflow)\n",
+            "example":true,
+            "default":true
+          },
+          "VARIANT_NAME":{
+            "type":"string",
+            "description":"Name of the variant",
+            "example":"XL"
+          },
+          "VARIANT_VALUE":{
+            "type":"string",
+            "description":"Value of your point of\nmeasurement for the\ncorresponding variant\nname\n",
+            "example":"57.5"
+          }
+        }
+      },
+      "AuthenticationRequest":{
+        "required":[
+          "email",
+          "password"
+        ],
+        "type":"object",
+        "properties":{
+          "email":{
+            "maxLength":50,
+            "minLength":1,
+            "pattern":"^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$",
+            "type":"string",
+            "example":"example@gmail.com"
+          },
+          "password":{
+            "type":"string",
+            "example":"secret"
+          }
+        }
+      },
+      "AuthenticateSuccessResponse":{
+        "type":"object"
+      },
+      "PurchaseOrder":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"integer",
+            "format":"int64",
+            "example":0
+          },
+          "reference":{
+            "type":"string",
+            "example":"po"
+          },
+          "shipmentDate":{
+            "type":"string",
+            "format":"date",
+            "example":"2022-01-20"
+          },
+          "orderDate":{
+            "type":"string",
+            "format":"date",
+            "example":"2022-01-01"
+          },
+          "tier1Id":{
+            "type":"integer",
+            "format":"int64",
+            "example":100
+          },
+          "tier1Name":{
+            "type":"string",
+            "example":"tier1"
+          },
+          "tier2Id":{
+            "type":"integer",
+            "format":"int64",
+            "example":100
+          },
+          "tier2Name":{
+            "type":"string",
+            "example":"tier2"
+          },
+          "lastModifiedByFirstName":{
+            "type":"string",
+            "example":"John"
+          },
+          "lastModifiedByLastName":{
+            "type":"string",
+            "example":"Doe"
+          },
+          "lastModifiedDate":{
+            "type":"string",
+            "format":"date-time"
+          },
+          "createdByFirstName":{
+            "type":"string",
+            "example":"John"
+          },
+          "createdByLastName":{
+            "type":"string",
+            "example":"John"
+          },
+          "createdDate":{
+            "type":"string",
+            "format":"date-time"
+          },
+          "status":{
+            "type":"string",
+            "example":"CREATED",
+            "enum":[
+              "CREATED",
+              "CANCELLED",
+              "USED"
+            ]
+          },
+          "products":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/PurchaseOrderProduct"
+            }
+          }
+        }
+      },
+      "PurchaseOrderProduct":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"integer",
+            "format":"int64",
+            "example":1
+          },
+          "productId":{
+            "type":"integer",
+            "format":"int64",
+            "example":10
+          },
+          "productIdentifierValue":{
+            "type":"string",
+            "example":"Bowl"
+          },
+          "quantity":{
+            "type":"number",
+            "format":"double",
+            "example":25
+          },
+          "unit":{
+            "type":"string",
+            "example":"box"
+          },
+          "productIdentifierType":{
+            "type":"string",
+            "example":"GTIN"
+          },
+          "sku":{
+            "type":"string",
+            "example":"0000-111-333"
+          },
+          "gtin":{
+            "type":"string",
+            "example":"08112354"
+          },
+          "name":{
+            "type":"string",
+            "example":"box"
+          },
+          "reference":{
+            "type":"string",
+            "example":"S20-M101"
+          },
+          "shipmentDate":{
+            "type":"string",
+            "format":"date",
+            "example":"2022-01-20"
+          }
+        }
+      },
+      "PageMetadata":{
+        "type":"object",
+        "properties":{
+          "size":{
+            "type":"integer",
+            "format":"int64"
+          },
+          "totalElements":{
+            "type":"integer",
+            "format":"int64"
+          },
+          "totalPages":{
+            "type":"integer",
+            "format":"int64"
+          },
+          "number":{
+            "type":"integer",
+            "format":"int64"
+          }
+        }
+      },
+      "PagedModelProduct":{
+        "type":"object",
+        "properties":{
+          "links":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/Link"
+            }
+          },
+          "content":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/Product"
+            }
+          },
+          "page":{
+            "$ref":"#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "Product":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"integer",
+            "format":"int64",
+            "example":1
+          },
+          "name":{
+            "type":"string",
+            "example":"Product"
+          },
+          "gtin":{
+            "type":"string",
+            "example":"00237324138006"
+          },
+          "sku":{
+            "type":"string",
+            "example":"93142000"
+          },
+          "reference":{
+            "type":"string",
+            "example":"Vendor - Example"
+          }
+        }
+      },
+      "EntityModelTestReport":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"integer",
+            "format":"int64",
+            "example":1
+          },
+          "uuid":{
+            "type":"string",
+            "example":"7156ac-0f83-4620-976f-073622a04422c"
+          },
+          "name":{
+            "type":"string",
+            "example":"file.pdf"
+          },
+          "size":{
+            "type":"integer",
+            "format":"int64",
+            "example":1024
+          },
+          "lastModifiedBy":{
+            "type":"string",
+            "example":"John Doe"
+          },
+          "lastModifiedDate":{
+            "type":"string",
+            "format":"date-time",
+            "example":"2022-01-01T00:00:00Z"
+          },
+          "mimeType":{
+            "type":"string",
+            "example":"application/pdf"
+          },
+          "status":{
+            "type":"string",
+            "example":"PASS",
+            "enum":[
+              "PASS",
+              "FAIL",
+              "DEROGATED",
+              "NA"
+            ]
+          },
+          "links":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "PagedModelEntityModelTestReport":{
+        "type":"object",
+        "properties":{
+          "links":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/Link"
+            }
+          },
+          "content":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/EntityModelTestReport"
+            }
+          },
+          "page":{
+            "$ref":"#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "CollectionModelEntityModelAttachment":{
+        "type":"object",
+        "properties":{
+          "links":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/Link"
+            }
+          },
+          "content":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/EntityModelAttachment"
+            }
+          }
+        }
+      },
+      "EntityModelAttachment":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"integer",
+            "format":"int64",
+            "example":1
+          },
+          "uuid":{
+            "type":"string",
+            "example":"7156ac-0f83-4620-976f-073622a04422c"
+          },
+          "name":{
+            "type":"string",
+            "example":"file.pdf"
+          },
+          "size":{
+            "type":"integer",
+            "format":"int64",
+            "example":1024
+          },
+          "lastModifiedBy":{
+            "type":"string",
+            "example":"John Doe"
+          },
+          "lastModifiedDate":{
+            "type":"string",
+            "format":"date-time",
+            "example":"2022-01-01T00:00:00Z"
+          },
+          "links":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "PendingProcessDTO":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"string",
+            "format":"uuid"
+          },
+          "status":{
+            "type":"string",
+            "enum":[
+              "COMPLETED",
+              "FAILED",
+              "PENDING"
+            ]
+          }
+        }
+      },
+      "FailedProcessDTO":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"string",
+            "format":"uuid"
+          },
+          "status":{
+            "type":"string",
+            "enum":[
+              "COMPLETED",
+              "FAILED",
+              "PENDING"
+            ]
+          },
+          "failures":{
+            "type":"array",
+            "items":{
+              "$ref":"#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "CompletedProcessDTO":{
+        "type":"object",
+        "properties":{
+          "id":{
+            "type":"string",
+            "format":"uuid"
+          },
+          "status":{
+            "type":"string",
+            "enum":[
+              "COMPLETED",
+              "FAILED",
+              "PENDING"
+            ]
+          },
+          "result":{
+            "type":"object"
+          }
+        }
+      }
+    },
+    "securitySchemes":{
+      "bearerAuth":{
+        "type":"http",
+        "scheme":"bearer",
+        "bearerFormat":"JWT"
+      }
+    }
+  },
+  "x-tagGroups":[
+    {
+      "name":"Authentication",
+      "tags":[
+        "Authentication"
+      ]
+    },
+    {
+      "name":"Import",
+      "tags":[
+        "Import (CSV)",
+        "Check CSV process status"
+      ]
+    },
+    {
+      "name":"Inspection",
+      "tags":[
+        "Inspections"
+      ]
+    },
+    {
+      "name":"Product",
+      "tags":[
+        "Manage product's attachments",
+        "Manage product's lab test reports",
+        "Manage product measurements"
+      ]
+    },
+    {
+      "name":"Purchase order",
+      "tags":[
+        "Purchase orders"
+      ]
+    }
+  ]
+}
