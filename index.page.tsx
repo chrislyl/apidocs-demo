@@ -22,7 +22,7 @@ export default function HomePage() {
         {/* <Image srcSet={`${require('./images/grid.svg')} light, ${require('./images/grid-dark.svg')} dark`} /> */}
         <h1>QIMA API Reference</h1>
         <p>Start with the First API for QIMA App</p>
-        <Button size="large" variant="primary" tone="brand" to="/guides/quickstart">
+        <Button size="large" variant="primary" tone="brand" to="/apis/QSP-public-api.json">
           Get started
         </Button>
         <CardWithCode
